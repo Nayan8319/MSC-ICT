@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registration Form</title>
+  <style>
+    .error { color: red; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h2>User Registration</h2>
+
+  <!-- Server-side errors -->
+  <% if (errors.length > 0) { %>
+    <ul style="color:red">
+      <% errors.forEach(e => { %>
+        <li><%= e.msg %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+
+  <form id="regForm" action="/register" method="POST" enctype="multipart/form-data">
+    Username: <input type="text" name="username" value="<%= old.username || '' %>"><br>
+    <span class="error" id="errUsername"></span><br>
+
+    Password: <input type="password" name="password"><br>
+    <span class="error" id="errPassword"></span><br>
+
+    Confirm Password: <input type="password" name="confirmPassword"><br>
+    <span class="error" id="errConfirmPassword"></span><br>
+
+    Email: <input type="email" name="email" value="<%= old.email || '' %>"><br>
+    <span class="error" id="errEmail"></span><br>
+
+    Gender:
+    <input type="radio" name="gender" value="Male" <%= old.gender==="Male"?"checked":"" %>>Male
+    <input type="radio" name="gender" value="Female" <%= old.gender==="Female"?"checked":"" %>>Female<br>
+    <span class="error" id="errGender"></span><br>
+
+    Hobbies:
+    <input type="checkbox" name="hobbies" value="Reading">Reading
+    <input type="checkbox" name="hobbies" value="Sports">Sports
+    <input type="checkbox" name="hobbies" value="Music">Music<br>
+    <span class="error" id="errHobbies"></span><br>
+
+    Profile Pic: <input type="file" name="profilePic" accept="image/*"><br>
+    <span class="error" id="errProfilePic"></span><br>
+
+    Other Pics: <input type="file" name="otherPics" accept="image/*" multiple><br>
+    <span class="error" id="errOtherPics"></span><br><br>
+
+    <button type="submit">Register</button>
+  </form>
+
+  <script>
+    document.getElementById("regForm").addEventListener("submit", function(event) {
+      let form = event.target;
+      let valid = true;
+
+      // Reset error messages
+      document.querySelectorAll(".error").forEach(el => el.textContent = "");
+
+      // Username
+      if (!form.username.value.trim()) {
+        document.getElementById("errUsername").textContent = "Username is required";
+        valid = false;
+      }
+
+      // Password
+      if (form.password.value.length < 6) {
+        document.getElementById("errPassword").textContent = "Password must be at least 6 characters";
+        valid = false;
+      }
+
+      // Confirm Password
+      if (form.password.value !== form.confirmPassword.value) {
+        document.getElementById("errConfirmPassword").textContent = "Passwords do not match";
+        valid = false;
+      }
+
+      // Email
+      let emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+      if (!emailPattern.test(form.email.value)) {
+        document.getElementById("errEmail").textContent = "Invalid email format";
+        valid = false;
+      }
+
+      // Gender
+      if (![...form.gender].some(r => r.checked)) {
+        document.getElementById("errGender").textContent = "Select gender";
+        valid = false;
+      }
+
+      // Hobbies
+      if (![...form.hobbies].some(c => c.checked)) {
+        document.getElementById("errHobbies").textContent = "Select at least one hobby";
+        valid = false;
+      }
+
+      // Profile Pic
+      if (!form.profilePic.files.length) {
+        document.getElementById("errProfilePic").textContent = "Profile picture is required";
+        valid = false;
+      }
+
+      // Other Pics
+      if (!form.otherPics.files.length) {
+        document.getElementById("errOtherPics").textContent = "At least one other picture is required";
+        valid = false;
+      }
+
+      // Stop form submission if invalid
+      if (!valid) event.preventDefault();
+    });
+  </script>
+</body>
+</html>
